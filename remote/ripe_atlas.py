@@ -2,6 +2,7 @@
 Get the ground truth location of probes and their corresponding IP addresses
 '''
 
+import country_converter as coco
 from dataclasses import dataclass
 from pathlib import Path
 import pickle
@@ -17,6 +18,7 @@ probe_pickle_path = 'remote/probes.pkl'
 class Probe:
     ipv4: str
     coordinates: Tuple[float, float]
+    continent: str
 
 
 '''
@@ -50,12 +52,17 @@ def get_probes(
         n_process = min(len(results), max_probes - cnt)
         n_invalid = 0
         for i in range(n_process):
-            ipv4 = results[i]['address_v4']
-            coordinates = results[i]['geometry']['coordinates']
+            result = results[i]
+            ipv4 = result['address_v4']
+            coordinates = result['geometry']['coordinates']
             if ipv4:
+                # country_code = result['country_code']
+                # continent = coco.convert(names=result['country_code'], to='Continent')
+                # print(country_code, continent)
                 probes.append(Probe(
-                    ipv4 = ipv4,
-                    coordinates = (coordinates[1], coordinates[0])
+                    ipv4=ipv4,
+                    coordinates=(coordinates[1], coordinates[0]),
+                    continent=coco.convert(names=result['country_code'], to='Continent')
                 ))
             else:
                 n_invalid += 1

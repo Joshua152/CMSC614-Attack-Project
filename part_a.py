@@ -12,6 +12,7 @@ SAFETY. Public RIPE Atlas metadata and free-tier geolocation APIs. Respect their
 
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from remote.ip_interface import IpLocationLookup
 from remote.maxmind import MaxMind
@@ -19,25 +20,29 @@ from remote.ripe_atlas import get_probes
 
 
 probes = get_probes()
-print(probes)
 
-def get_errors(provider: IpLocationLookup):
+
+def get_errors_df(provider: IpLocationLookup):
     errors = []
+    continents = []
 
     ips = []
     for probe in probes:
         ips.append(probe.ipv4)
 
-    '''
-    Either providerLocs or probes.coordinates is in [long, lat] instaed of [lat, long]
-    '''
     providerLocs = provider.lookup_location(ips)
     for probe in probes:
         distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
         errors.append(distance_km)
+        continents.append(probe.continent)
         # print(probe.ipv4, probe.coordinates, providerLocs[probe.ipv4], distance_km)
 
-    return errors
+    df = pd.DataFrame({
+        'error': errors,
+        'continent': continents
+    })
+
+    return df
 
 
 def plot_cdf(errors: list[float]):
@@ -50,6 +55,9 @@ def plot_cdf(errors: list[float]):
     plt.show()
 
 
-errors = get_errors(MaxMind())
-print(len(errors))
-plot_cdf(errors)
+df = get_errors_df(MaxMind())
+print(df)
+# plot all errors
+plot_cdf(df['error'].tolist())
+# plot by continent: Europe
+plot_cdf(df.loc[df['continent'] == 'America', 'error'])
