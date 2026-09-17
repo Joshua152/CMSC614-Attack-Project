@@ -10,7 +10,7 @@ import requests
 
 
 atlas_base_url = 'https://atlas.ripe.net/api/v2'
-probe_pickle_path = 'probes.pkl'
+probe_pickle_path = 'remote/probes.pkl'
 
 
 @dataclass
