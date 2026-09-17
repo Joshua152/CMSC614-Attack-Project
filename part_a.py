@@ -10,11 +10,12 @@ B  Go after the mechanism: show that prefix size predicts error, and derive a ru
 SAFETY. Public RIPE Atlas metadata and free-tier geolocation APIs. Respect their rate limits.
 '''
 
+from geopy.distance import geodesic
+import matplotlib.pyplot as plt
+
 from remote.ip_interface import IpLocationLookup
 from remote.maxmind import MaxMind
 from remote.ripe_atlas import get_probes
-
-from geopy.distance import geodesic
 
 
 probes = get_probes()
@@ -36,14 +37,19 @@ def get_errors(provider: IpLocationLookup):
         errors.append(distance_km)
         # print(probe.ipv4, probe.coordinates, providerLocs[probe.ipv4], distance_km)
 
-    errors.sort()
-
     return errors
 
-def plot_cdf():
 
+def plot_cdf(errors: list[float]):
+    plt.ecdf(errors, label="CDF")
 
-    pass
+    plt.xlabel("Error (km)")
+    plt.ylabel("CDF")
+    plt.title("Error CDF")
+    plt.grid(True)
+    plt.show()
+
 
 errors = get_errors(MaxMind())
 print(len(errors))
+plot_cdf(errors)
