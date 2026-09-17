@@ -14,6 +14,8 @@ class MaxMind(IpLocationLookup):
                 try:
                     response = reader.city(ip)
                     ip_locations[ip] = (response.location.latitude, response.location.longitude)
+                except ValueError:
+                    print(f'Value error on: {ip}')
                 except AddressNotFoundError:
                     print(f'Could not find {ip} in the MaxMind database.')
 

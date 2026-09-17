@@ -35,7 +35,7 @@ def get_probes(
 
     probes = []
 
-    url = f'{atlas_base_url}/probes/?page_size=3&sort=id'
+    url = f'{atlas_base_url}/probes/?page_size=10&sort=id'
 
     cnt = 0
     while cnt < max_probes:
@@ -48,13 +48,19 @@ def get_probes(
         results = data['results']
 
         n_process = min(len(results), max_probes - cnt)
+        n_invalid = 0
         for i in range(n_process):
-            probes.append(Probe(
-                ipv4 = results[i]['address_v4'],
-                coordinates = tuple(results[i]['geometry']['coordinates'])
-            ))
+            ipv4 = results[i]['address_v4']
+            coordinates = results[i]['geometry']['coordinates']
+            if ipv4:
+                probes.append(Probe(
+                    ipv4 = ipv4,
+                    coordinates = (coordinates[1], coordinates[0])
+                ))
+            else:
+                n_invalid += 1
 
-        cnt += n_process
+        cnt += n_process - n_invalid
         url = data['next']
         if not url:
             break
