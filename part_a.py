@@ -40,7 +40,6 @@ def get_errors_df(provider: IpLocationLookup):
             errors.append(distance_km)
             continents.append(probe.continent)
             connection_type.append(probe.connection_type)
-            # print(probe.ipv4, probe.coordinates, providerLocs[probe.ipv4], distance_km)
 
     df = pd.DataFrame({
         'error': errors,

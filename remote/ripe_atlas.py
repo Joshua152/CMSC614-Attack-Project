@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from pathlib import Path
 import pickle
 from typing import Tuple
-import geoip2
 import requests
 
 
@@ -59,9 +58,6 @@ def get_probes(
             ipv4 = result['address_v4']
             geometry = result['geometry']
             if ipv4 and geometry:
-                # country_code = result['country_code']
-                # continent = coco.convert(names=result['country_code'], to='Continent')
-                # print(country_code, continent)
                 coordinates = geometry['coordinates']
                 probes.append(Probe(
                     ipv4=ipv4,
