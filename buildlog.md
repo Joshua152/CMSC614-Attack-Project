@@ -8,3 +8,5 @@ Implemented IP lookup for MaxMind
 Implemented error and CDF (interesting to note that the MaxMind ip seems to have a default if it can't locate the address: (37.751, -97.822))
 
 Put the results in a Pandas dataframe so it would be easy to plot based on continent, fixed vs mobile
+
+Graphed the CDF error plots on a single plot so it is easier to visualize against each other
