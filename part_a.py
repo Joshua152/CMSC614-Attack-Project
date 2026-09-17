@@ -50,7 +50,7 @@ def get_errors_df(provider: IpLocationLookup):
     return df
 
 
-def plot_cdf(errors: Mapping[str, list[float]]):
+def plot_cdf(errors: Mapping[str, list[float]], title: str):
     fig = plt.figure()
     ax = fig.gca()
 
@@ -59,7 +59,7 @@ def plot_cdf(errors: Mapping[str, list[float]]):
 
     plt.xlabel('Error (km)')
     plt.ylabel('CDF')
-    plt.title('Error CDF by Continent')
+    plt.title(title)
     plt.grid(True)
     plt.legend()
     plt.show()
@@ -70,4 +70,4 @@ if __name__ == '__main__':
     plot_cdf({
         'All': df['error'].tolist(),
         **df.groupby('continent')['error'].apply(list).to_dict()
-    })
+    }, 'Error CDF by Continent via MaxMind')
