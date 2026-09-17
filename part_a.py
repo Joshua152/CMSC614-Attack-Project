@@ -10,6 +10,8 @@ B  Go after the mechanism: show that prefix size predicts error, and derive a ru
 SAFETY. Public RIPE Atlas metadata and free-tier geolocation APIs. Respect their rate limits.
 '''
 
+from typing import Mapping
+
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -25,6 +27,7 @@ probes = get_probes()
 def get_errors_df(provider: IpLocationLookup):
     errors = []
     continents = []
+    connection_type = []
 
     ips = []
     for probe in probes:
@@ -32,32 +35,40 @@ def get_errors_df(provider: IpLocationLookup):
 
     providerLocs = provider.lookup_location(ips)
     for probe in probes:
-        distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
-        errors.append(distance_km)
-        continents.append(probe.continent)
-        # print(probe.ipv4, probe.coordinates, providerLocs[probe.ipv4], distance_km)
+        if probe.ipv4 in providerLocs:
+            distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
+            errors.append(distance_km)
+            continents.append(probe.continent)
+            connection_type.append(probe.connection_type)
+            # print(probe.ipv4, probe.coordinates, providerLocs[probe.ipv4], distance_km)
 
     df = pd.DataFrame({
         'error': errors,
-        'continent': continents
+        'continent': continents,
+        'connection_type': connection_type
     })
 
     return df
 
 
-def plot_cdf(errors: list[float]):
-    plt.ecdf(errors, label="CDF")
+def plot_cdf(errors: Mapping[str, list[float]]):
+    fig = plt.figure()
+    ax = fig.gca()
 
-    plt.xlabel("Error (km)")
-    plt.ylabel("CDF")
-    plt.title("Error CDF")
+    for category in errors:
+        ax.ecdf(errors[category], label=category)
+
+    plt.xlabel('Error (km)')
+    plt.ylabel('CDF')
+    plt.title('Error CDF by Continent')
     plt.grid(True)
+    plt.legend()
     plt.show()
 
 
-df = get_errors_df(MaxMind())
-print(df)
-# plot all errors
-plot_cdf(df['error'].tolist())
-# plot by continent: Europe
-plot_cdf(df.loc[df['continent'] == 'America', 'error'])
+if __name__ == '__main__':
+    df = get_errors_df(MaxMind())
+    plot_cdf({
+        'All': df['error'].tolist(),
+        **df.groupby('continent')['error'].apply(list).to_dict()
+    })
