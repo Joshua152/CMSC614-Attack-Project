@@ -11,9 +11,8 @@ Put the results in a Pandas dataframe so it would be easy to plot based on conti
 
 Graphed the CDF error plots on a single plot so it is easier to visualize against each other
 
-# Sep 19, 2026
+### Sep 19, 2026
 Implemented IpInfo
 The API has a 50k per month API limit
 Since we are looking at 20k probes, we are under that quota but, we need to save the values in a file so that we can cache the result
 If we don't, we would run into the limit after only 2 full lookups
-

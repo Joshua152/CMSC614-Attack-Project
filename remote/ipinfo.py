@@ -40,4 +40,3 @@ class IpInfo(IpLocationLookup):
             pickle.dump(ip_locations, file)
 
         return ip_locations
-
