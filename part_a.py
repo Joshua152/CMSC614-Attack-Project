@@ -17,9 +17,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from remote.ip_interface import IpLocationLookup
+from remote.ipinfo import IpInfo
 from remote.maxmind import MaxMind
 from remote.ripe_atlas import get_probes
 
+
+MAX_MIND = 'MaxMind'
+IPINFO = 'IpInfo'
 
 probes = get_probes()
 
@@ -36,10 +40,13 @@ def get_errors_df(provider: IpLocationLookup):
     providerLocs = provider.lookup_location(ips)
     for probe in probes:
         if probe.ipv4 in providerLocs:
-            distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
-            errors.append(distance_km)
-            continents.append(probe.continent)
-            connection_type.append(probe.connection_type)
+            try:
+                distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
+                errors.append(distance_km)
+                continents.append(probe.continent)
+                connection_type.append(probe.connection_type)
+            except ValueError:
+                print(providerLocs[probe.ipv4], probe.coordinates)
 
     df = pd.DataFrame({
         'error': errors,
@@ -65,9 +72,24 @@ def plot_cdf(errors: Mapping[str, list[float]], title: str):
     plt.show()
 
 
-if __name__ == '__main__':
-    df = get_errors_df(MaxMind())
+def plot_errors_for_provider(providerStr: str):
+    provider = None
+    if providerStr == MAX_MIND:
+        provider = MaxMind()
+    elif providerStr == IPINFO:
+        provider = IpInfo()
+    else:
+        print(f'Invalid provider')
+        return
+
+    df = get_errors_df(provider)
     plot_cdf({
         'All': df['error'].tolist(),
         **df.groupby('continent')['error'].apply(list).to_dict()
-    }, 'Error CDF by Continent via MaxMind')
+    }, f'Error CDF by Continent via {providerStr}')
+    
+
+if __name__ == '__main__':
+    providers = [MAX_MIND, IPINFO]
+    for provider in providers:
+        plot_errors_for_provider(provider)

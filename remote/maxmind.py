@@ -6,7 +6,7 @@ from remote.ip_interface import IpLocationLookup
 
 
 class MaxMind(IpLocationLookup):
-    def lookup_location(self, ips: list[str]) -> Tuple[float, float]:
+    def lookup_location(self, ips: list[str]) -> dict[str, Tuple[float, float]]:
         ip_locations = {}
 
         with geoip2.database.Reader('data/GeoLite2-City.mmdb') as reader:
