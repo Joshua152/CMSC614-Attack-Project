@@ -12,7 +12,7 @@ from remote.ip_interface import IpLocationLookup
 load_dotenv()
 api_token = os.getenv('IPINFO_API_TOKEN')
 
-ip_info_save_path = 'remote/ip_info_save.pkl'
+ip_info_save_path = 'remote/cache/ip_info_save.pkl'
 
 handler = ipinfo.getHandler(api_token)
 

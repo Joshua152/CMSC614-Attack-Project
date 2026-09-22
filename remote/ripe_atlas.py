@@ -11,7 +11,7 @@ import requests
 
 
 atlas_base_url = 'https://atlas.ripe.net/api/v2'
-probe_pickle_path = 'remote/probes.pkl'
+probe_pickle_path = 'remote/cache/probes.pkl'
 
 
 @dataclass
@@ -45,7 +45,7 @@ def get_probes(
         print(f'{cnt}/{max_probes}')
         response = requests.get(url)
         if response.status_code != 200:
-            print(f'Error hitting RIPE Atlas probes URL: {response.status_code}')
+            print(f'Error hitting RIPE Atlas probes endpoint: {response.status_code}')
             return []
 
         data = response.json()

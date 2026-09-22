@@ -19,3 +19,8 @@ If we don't, we would run into the limit after only 2 full lookups
 
 ### Sep 21, 2026
 Implemented Ip2Location using the downloaded database and the python Ip2Location client
+
+Implemented DB-IP using the paid API on a free trial
+To still have access to the data after I cancel the trial, I have saved the result in a pickle file
+
+Added images of results
