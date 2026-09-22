@@ -42,8 +42,7 @@ def get_probes(
     if use_pickle_if_available and Path(probe_pickle_path).is_file():
         with open(probe_pickle_path, 'rb') as file:
             print("Open probes from pickle")
-            probes = pickle.load(file)
-            return probes
+            return pickle.load(file)
 
     probes = []
 
