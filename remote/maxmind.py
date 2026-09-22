@@ -1,3 +1,5 @@
+import os
+
 import geoip2.database
 from geoip2.errors import AddressNotFoundError
 from typing import Tuple
@@ -9,7 +11,7 @@ class MaxMind(IpLocationLookup):
     def lookup_location(self, ips: list[str]) -> dict[str, Tuple[float, float]]:
         ip_locations = {}
 
-        with geoip2.database.Reader('data/GeoLite2-City.mmdb') as reader:
+        with geoip2.database.Reader(os.path.join('data', 'GeoLite2-City.mmdb')) as reader:
             for ip in ips:
                 try:
                     response = reader.city(ip)

@@ -12,10 +12,12 @@ SAFETY. Public RIPE Atlas metadata and free-tier geolocation APIs. Respect their
 
 from typing import Mapping
 
+import IP2Location
 from geopy.distance import geodesic
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from remote.ip2location import Ip2Location
 from remote.ip_interface import IpLocationLookup
 from remote.ipinfo import IpInfo
 from remote.maxmind import MaxMind
@@ -24,6 +26,7 @@ from remote.ripe_atlas import get_probes
 
 MAX_MIND = 'MaxMind'
 IPINFO = 'IpInfo'
+IP2LOCATION = 'Ip2Location'
 
 probes = get_probes()
 
@@ -46,7 +49,7 @@ def get_errors_df(provider: IpLocationLookup):
                 continents.append(probe.continent)
                 connection_type.append(probe.connection_type)
             except ValueError:
-                print(providerLocs[probe.ipv4], probe.coordinates)
+                print(f'Value error with provider locs: {providerLocs[probe.ipv4]} and probe locs: {probe.coordinates}')
 
     df = pd.DataFrame({
         'error': errors,
@@ -78,6 +81,8 @@ def plot_errors_for_provider(providerStr: str):
         provider = MaxMind()
     elif providerStr == IPINFO:
         provider = IpInfo()
+    elif providerStr == IP2LOCATION:
+        provider = Ip2Location()
     else:
         print(f'Invalid provider')
         return
@@ -90,6 +95,6 @@ def plot_errors_for_provider(providerStr: str):
     
 
 if __name__ == '__main__':
-    providers = [MAX_MIND, IPINFO]
+    providers = [MAX_MIND, IPINFO, IP2LOCATION]
     for provider in providers:
         plot_errors_for_provider(provider)

@@ -16,3 +16,6 @@ Implemented IpInfo
 The API has a 50k per month API limit
 Since we are looking at 20k probes, we are under that quota but, we need to save the values in a file so that we can cache the result
 If we don't, we would run into the limit after only 2 full lookups
+
+### Sep 21, 2026
+Implemented Ip2Location using the downloaded database and the python Ip2Location client
