@@ -29,6 +29,9 @@ IPINFO = 'IpInfo'
 IP2LOCATION = 'Ip2Location'
 DBIP_STR = 'DB-IP'
 
+MOBILE = 'Mobile'
+FIXED = 'Fixed'
+
 probes = get_probes()
 
 
@@ -41,16 +44,16 @@ def get_errors_df(provider: IpLocationLookup):
     for probe in probes:
         ips.append(probe.ipv4)
 
-    providerLocs = provider.lookup_location(ips)
+    provider_locs = provider.lookup_location(ips)
     for probe in probes:
-        if probe.ipv4 in providerLocs:
+        if probe.ipv4 in provider_locs:
             try:
-                distance_km = geodesic(providerLocs[probe.ipv4], probe.coordinates).kilometers
+                distance_km = geodesic(provider_locs[probe.ipv4], probe.coordinates).kilometers
                 errors.append(distance_km)
                 continents.append(probe.continent)
                 connection_type.append(probe.connection_type)
             except ValueError:
-                print(f'Value error with provider locs: {providerLocs[probe.ipv4]} and probe locs: {probe.coordinates}')
+                print(f'Value error with provider locs: {provider_locs[probe.ipv4]} and probe locs: {probe.coordinates}')
 
     df = pd.DataFrame({
         'error': errors,
@@ -76,15 +79,15 @@ def plot_cdf(errors: Mapping[str, list[float]], title: str):
     plt.show()
 
 
-def plot_errors_for_provider(providerStr: str):
+def plot_errors_for_provider(provider_str: str):
     provider = None
-    if providerStr == MAX_MIND:
+    if provider_str == MAX_MIND:
         provider = MaxMind()
-    elif providerStr == IPINFO:
+    elif provider_str == IPINFO:
         provider = IpInfo()
-    elif providerStr == IP2LOCATION:
+    elif provider_str == IP2LOCATION:
         provider = Ip2Location()
-    elif providerStr == DBIP_STR:
+    elif provider_str == DBIP_STR:
         provider = DBIP()
     else:
         print(f'Invalid provider')
@@ -94,7 +97,12 @@ def plot_errors_for_provider(providerStr: str):
     plot_cdf({
         'All': df['error'].tolist(),
         **df.groupby('continent')['error'].apply(list).to_dict()
-    }, f'Error CDF by Continent via {providerStr}')
+    }, f'Error CDF by Continent via {provider_str}')
+
+    plot_cdf({
+        'All': df['error'].tolist(),
+        **df[df['connection_type'].isin([MOBILE, FIXED])].groupby('connection_type')['error'].apply(list).to_dict()
+    }, f'Error CDF by Fixed/Mobile ISP via {provider_str}')
     
 
 if __name__ == '__main__':

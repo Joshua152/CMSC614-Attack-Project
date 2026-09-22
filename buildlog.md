@@ -24,3 +24,6 @@ Implemented DB-IP using the paid API on a free trial
 To still have access to the data after I cancel the trial, I have saved the result in a pickle file
 
 Added images of results
+
+Augment the RIPE Atlas probe retrieval with fixed vs mobile IP information from the DB-IP API on the free trial
+It is difficult to determine what is fixed vs mobile so we take a lot smaller sample to make sure the values are correct (e.g. only use T-Mobile)
