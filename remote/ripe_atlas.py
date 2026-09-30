@@ -28,6 +28,28 @@ class Probe:
     continent: str
     connection_type: str # Fixed vs Mobile
     isp: str # Keep the ISP in case we want to look at more mobile ISPs
+    prefix: str = None
+
+def _classify_by_tags(probe_data: dict) -> Tuple[str, str]:
+    if 'tags' not in probe_data or not probe_data['tags']:
+        return None, None
+    
+    tags = probe_data['tags']
+    tag_slugs = [tag['slug'].lower() for tag in tags]
+    tag_names = [tag['name'].lower() for tag in tags]
+    all_tags = tag_slugs + tag_names
+    
+    mobile_keywords = ['mobile', 'wireless', 'cellular', '3g', '4g', '5g', 'lte', 'gsm', 'cdma']
+    for keyword in mobile_keywords:
+        if any(keyword in tag for tag in all_tags):
+            return 'Mobile'
+    
+    fixed_keywords = ['home', 'residential', 'broadband', 'fiber', 'dsl', 'cable', 'business', 'datacenter']
+    for keyword in fixed_keywords:
+        if any(keyword in tag for tag in all_tags):
+            return 'Fixed'
+    
+    return None
 
 
 '''
@@ -65,14 +87,18 @@ def get_probes(
             result = results[i]
             ipv4 = result['address_v4']
             geometry = result['geometry']
+            prefix = result['prefix_v4']
             if ipv4 and geometry:
+                tag_conn_type = _classify_by_tags(result)
+
                 coordinates = geometry['coordinates']
                 probes.append(Probe(
                     ipv4=ipv4,
                     coordinates=(coordinates[1], coordinates[0]),
                     continent=coco.convert(names=result['country_code'], to='Continent'),
-                    connection_type='Unknown',
-                    isp=None
+                    connection_type=tag_conn_type if tag_conn_type else 'Unknown',
+                    isp=None,
+                    prefix=prefix
                 ))
             else:
                 n_invalid += 1
@@ -128,7 +154,8 @@ def _augment_fixed_mobile_ip(probes: list[Probe]):
 
     for probe in probes:
         probe.isp = isp_map[probe.ipv4]
-        probe.connection_type = connection_map[probe.ipv4]
+        if probe.connection_type == 'Unknown':
+            probe.connection_type = connection_map[probe.ipv4]
 
 
 def _is_mobile_isp(isp: str) -> bool:
