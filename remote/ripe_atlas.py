@@ -108,7 +108,7 @@ def get_probes(
         if not url:
             break
 
-    _augment_fixed_mobile_ip(probes)
+    # _augment_fixed_mobile_ip(probes)
 
     if save_pickle:
         with open(probe_pickle_path, 'wb') as file:

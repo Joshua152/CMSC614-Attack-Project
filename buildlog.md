@@ -27,3 +27,6 @@ Added images of results
 
 Augment the RIPE Atlas probe retrieval with fixed vs mobile IP information from the DB-IP API on the free trial
 It is difficult to determine what is fixed vs mobile so we take a lot smaller sample to make sure the values are correct (e.g. only use T-Mobile)
+
+### Oct 4, 2026
+Determine fixed vs mobile IPs with the tags from the RIPE Atlas databse to give us more datapoints
